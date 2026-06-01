@@ -1,0 +1,136 @@
+{{define "title"}}Prosjektmapping{{end}}
+{{define "content"}}
+<div class="max-w-2xl mx-auto">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Prosjektmapping</h1>
+    <div class="flex gap-4">
+      <a href="/timer" class="text-sm text-gray-500 hover:text-gray-700">← Timer</a>
+      <form method="POST" action="/logout">
+        <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">Logg ut</button>
+      </form>
+    </div>
+  </div>
+
+  <p class="text-sm text-gray-600 mb-6">
+    Knytt tags fra tidtaking til Xledger-prosjekt og aktivitet for eksport.
+  </p>
+
+  {{if .Error}}
+  <div id="error-msg" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+    {{.Error}}
+  </div>
+  {{end}}
+
+  <!-- Add new mapping -->
+  <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3">Legg til mapping</h2>
+    <form method="POST" action="/projects" class="flex flex-col gap-3">
+      <div class="flex gap-3">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="tag">Tag</label>
+          <input type="text" id="tag" name="tag" required
+            placeholder="f.eks. kurs"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="prosjekt">Xledger-prosjekt</label>
+        <input type="text" id="prosjekt" name="prosjekt"
+          placeholder="f.eks. 100783 - Salg og markedsføring - Trondheim"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="aktivitet">Xledger-aktivitet</label>
+        <input type="text" id="aktivitet" name="aktivitet"
+          placeholder="f.eks. 250 - Markedsføring"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <button type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          Legg til
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Existing mappings -->
+  <div class="bg-white rounded-lg shadow-md p-4">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3">Eksisterende mappinger</h2>
+    {{if .Projects}}
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-gray-200">
+          <th class="text-left pb-2 text-gray-600">Tag</th>
+          <th class="text-left pb-2 text-gray-600">Prosjekt</th>
+          <th class="text-left pb-2 text-gray-600">Aktivitet</th>
+          <th class="pb-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Projects}}
+        <tr class="border-b border-gray-100 hover:bg-gray-50" id="project-{{.Id}}">
+          <td class="py-2 pr-3 font-mono text-xs bg-gray-100 rounded px-1 whitespace-nowrap">{{.GetString "tag"}}</td>
+          <td class="py-2 pr-3 text-gray-700">{{.GetString "prosjekt"}}</td>
+          <td class="py-2 pr-3 text-gray-700">{{.GetString "aktivitet"}}</td>
+          <td class="py-2 text-right">
+            <form method="POST" action="/projects/{{.Id}}/delete" class="inline">
+              <button type="submit" data-action="delete"
+                class="text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded hover:bg-red-50"
+                onclick="return confirm('Slett mapping for tag «{{.GetString "tag"}}»?')">
+                Slett
+              </button>
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    {{else}}
+    <p class="text-gray-500 text-sm">Ingen mappinger registrert ennå.</p>
+    {{end}}
+  </div>
+
+  <!-- Export section -->
+  <div class="bg-white rounded-lg shadow-md p-4 mt-6">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3">Eksport til Xledger</h2>
+    <p class="text-sm text-gray-600 mb-3">Last ned tidtakinger for en måned som JSON-fil klar for Xledger-pluginen.</p>
+    <form id="export-form" class="flex gap-3 items-end">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="export-month">Måned</label>
+        <input type="month" id="export-month" name="month"
+          value="{{now}}"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button type="button" onclick="downloadExport()"
+        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+        Last ned JSON
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+async function downloadExport() {
+  const month = document.getElementById('export-month').value;
+  if (!month) {
+    alert('Velg en måned');
+    return;
+  }
+  const resp = await fetch('/api/export?month=' + encodeURIComponent(month));
+  if (!resp.ok) {
+    alert('Feil ved eksport: ' + resp.status);
+    return;
+  }
+  const data = await resp.json();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'xledger-eksport-' + month + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+{{end}}

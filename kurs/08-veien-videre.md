@@ -24,7 +24,7 @@ Akkurat her er det vanskelig på grunn av at jeg ikke ønsker å dele innlogging
 
 > kan du lage meg et playwright-script jeg kan kjøre for å holde sesjonen i auth.json aktivt, slik at jeg ikke blir logget ut?
 
-Å finne ut hvordan agenten skal klare å verifisere sitt arbeid er hva jeg bruker mest hjernekapasitet på i mitt arbeid nå. Hvilke ting trenger den tilgang til? Hvordan kan jeg gjøre det sikkert? Hvordan kan jeg unngå at agenten overser instruks om verifikasjon?
+Dette er hva jeg bruker mest hjernekapasitet på i mitt arbeid nå. Hvordan kan jeg hjelpe agenten til å verifisere sitt eget arbeid?
 
 
 # Jobbe med flere agenter samtidig
@@ -71,7 +71,6 @@ Dette er de tre vanligste variantene av at KI-modellen feiler på noe vis:
 1. Den gjetter og gjør dårlig arbeid.
 2. Den kjører seg fast og kommer ikke videre.
 3. Resultatet virker ikke.
-4. Agenten kjørte ikke testene.
 
 ## Dårlige antakelser og dårlige utfall
 Antakelser og overraskende løsninger er vanlig når instruksen er for dårlig. Går det helt i feil retning er det vanskelig å korrigere, fordi konteksten til forespørselen fylles med det dårlige forslaget. Eksempelvis fungerer det sjeldent å korrigere etterpå, altså dette fungerer ikke:
@@ -102,21 +101,7 @@ Sammenligne disse:
 
 > Implementer funksjonaliteten. Når du er ferdig skal du kjøre alle testene. Kjør opp server og sjekk at endepunkt /a nå inneholder teksten "ny funksjonalitet", først da er du ferdig.
 
-> Start ved å skrive en test som sjekker at endepunkt /a inneholder teksten "ny funksjonalitet". Sørg for at testen feiler (TDD rød). Implementer funksjonaliteten. Kjør testen på ny. Sørg for at testen er OK (TDD grønn). Verifiser at alle andre tester også kjører og er grønn.
-
-## Agenten kjørte ikke testene
-En beskrivelse i AGENTS.md eller i intruksen fungerer ikke alltid. Agenten glemmer av og hopper over.
-Da kan [hooks](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-hooks) være løsningen, der en kan tvinge agenten til å kjøre en bestemt kommando et bestemt sted i loopen.
-
-[Her er en god introduksjonsvideo for Copilot](https://www.youtube.com/watch?v=03CfGf9iw_U).
-
-
-# Hva er gode tester for en agent?
-Agenten er veldig flink til å skrive tester, kanskje for flink. Eksempelvis, dersom du har kode som er vanskelig å teste på grunn av sterkt koblede avhengigheter, så mocker agenten gjerne bort avhengighetene for å teste en bit av koden. Den er sykt god på mocking, men tester med mye mocking representerer ofte dårlig kode og sårbare tester.
-
-Jeg ber ikke ageten skrive slike tester, jeg fokuserer kun på ende-til-ende tester. Det er utfallet, hensikten og formålet som er viktig. Selfølgelig ingen regler uten unntak, det gir mening å skrive tester for moduler du skal skrive om, men tenk deg om for hvilket grensesnitt du legger testene på. Kommer du deg lenger unna koden og nærmere produktet er det mye enklere å verifisere at testene er riktig.
-
-I den grad jeg gjør review av kode, er det review av testkode jeg bruker mest tid på. Ble dette slik jeg forestilte meg? Beskriver det formålet med den nye funksjonaliteten? Vil testen fungere likevel om jeg bytter ut implementasjonen?
+> Start ved å skrive en test som sjekker at endepunkt /a inneholder teksten "ny funksjonalitet". Sørg for at testen feiler (TDD red). Implementer funksjonaliteten. Kjør testen på ny. Sørg for at testen er OK (TDD grønn). Verifiser at alle andre tester også kjører og er grønn.
 
 
 # Problemer med fyllt kontekst
@@ -165,62 +150,32 @@ Dette kommer i mange farger og former, her er noen ressurser du kan sjekke ut:
 
 Samtidig er det viktig å ikke sette unaturlige begrensinger i hva en kan utforske. Derfor vil jeg anbefale at en bruker KI fritt en periode, før en gjør seg opp en mening om kostnaden svarer til verdien det skaper.
 
-Rent hardware-messig kan vi også regne på det, stemmer det at tokens er på billigsalg? I følge estimater og gjetning fra internett trenger Claude Sonnet 4.6 en NVIDIA DGX H100 med 640GB minne som koster omtrent 4,5 millioner kroner. Den kan generere opp til 80 tokens i sekundet, det vil si håndere en bruker om gangen. Gitt en nedbetalingstid på 2 år og perfekt 100% utnyttelse sitter vi da med en kostnad på omtrent 256 kroner / time.
+Rent hardware-messig kan vi også regne på det, stemmer det at tokens er på billigsalg? I følge estimater og gjetning fra internett trenger Claude Sonnet 4.6 en NVIDIA DGX H100 med 640GB minne som koster omtrent 4,5 millioner kroner. Den kan generere opp til 80 tokens i sekundet, det vil si håndere en bruker om gangen. Gitt en nedbetalingstid på 2 år og perfekt 100% utnyttelse sitter vi da med en kostnad på omtrent 0,26 kroner / time.
 
 ```
-4 500 000 kroner / (2 år x 365 dager/år x 24 timer/dag) ~= 256 kroner / time
+4 500 000 kroner / (2 år x 365 dager/år x 24 timer/dag) ~ 0,26 kroner / time
 ```
 
 Det er mye rimeligere enn et menneske, men helt klart en forenklet model. Eksempelvis har vi ikke tatt med treningskosten, hvor stor utnyttelse en klarer å oppnå på serverparken, kostnad for strøm, leie og vedlikehold.
 
-Uansett, det er ikke vanskelig å forestille seg at KI-eventyret kan bli ekstremt lønnsomt for aktørene som sitter på største del av markedet.
-
 
 # Kjøre modeller lokalt
-Hvis du har en ny macbook med mye RAM, er det relativt enkelt å kjøre en modell lokalt. Modellene er ikke like gode som de du kan kjøpe på abonnement, men de klarer mye som en skulle tro en måtte ha en leid modell på.
 
-Du kan prøve å starte GPT-OSS som fungerer til mye:
-```shell
-brew install llama.cpp
-llama-server -hf ggml-org/gpt-oss-20b-GGUF --jinja -c 0 --host 127.0.0.1 --port 8080
-```
 
-Se om den klarer å trekke ut informasjon fra JSON:
+# Rammeverk
+https://github.com/iyaki/ralphex
 
-> Se innlimt JSON. Hent ut x y og z. La output være strukturert JSON på formen {"x": "...", "y": "...", "z": "..."}
 
-Advarsel: Å gjøre seg kjent med de tekniske begrepene for KI-modeller er et kaninhull. Antall parametre, kvantifisert, mode of expert, gguf, osv. Her kan du synke mye tid. Tips, bruk gemini til å forklare hva de ulike tingene er.
+# Hva er gode tester for en agent?
 
 
 # Skal vi bry oss om kodekvalitet nå?
-Ja, men ikke på samme måte som før. Detaljer er mindre viktige nå, mener jeg, men oppførsel er fortsatt like viktig. Uten agenter var det ikke uvanlig at en endring på et sted ga en stor og alvorlig feil et helt annet sted. Ofte et signal på dårlig kodekvalitet. Sannsynligheten for slike feil går ikke ned med agenter.
-
-Naivt kan en tenke seg at utfallet er:
-```
-sannsynlighet * antall endringer = antall feil
-```
-
-Gitt at sannsynligheten er den samme eller omtrent lik, med agenter er `antall endringer` økende, derfor må en gjøre noe med `sannsynlighet`. Hvordan gjør en det?
-
-Gode abstraksjoner (interfaces, modularitet). Bra testing (ende til ende, beskriver hensikt). Solid rekkverk (blue green deployments, automatiserte reviews). Du skjønner tegningen.
 
 
 # Diktering
-Siden KI-modellene er så gode på språk og tastatur er tregere enn å snakke, prøv diktering. Det er effektivt spesielt i en planleggingsfase der du ber agenten om å lage en plan.
-
-På MacOS er diktering innebygd, du finner det under _Systeminnstillinger_, søk etter _Diktering_:
-
-![innstillinger for diktering på macos](diktering.png)
-
-> dette er skrevet med diktering. Veldig nyttig når du har mange detaljer om en ting du skal lage men ikke orker å skrive ned alle detaljene som fin prosa. Ofte oppdager jeg at jeg tenker saktere enn jeg snakker og jeg må stoppe opp for å tenke hva som er neste naturlige setning. I motsetning til når jeg skriver der teksten alltid er klar for meg fordi jeg skriver så sakte.
 
 
 # Ulike typer modeller
-Kurset har bruk modellen _Claude Sonnet 4.6_ fordi den gir gode resultater, er relativt billig, samt at jeg er kjent med den. Ofte gir også _Auto_ gode resultater, men jeg anbefaler å låse ned en modell som du synes fungerer bra. Det er fordi modellene oppfører seg ulikt, slik at det blir en uvant opplevelse. Språket er allerede upresist, så en ønsker ikke flere variabler som kan ødelegge for godt resultat.
-
-Kort sagt; billigere og raskere modeller er dårligere, dyrere og tregere modeller er bedre.
-
-En artig forskjell på Codex og Claude er at dersom du merker tekst med instruks og skriver `.` som kommando, da vil Codex klage "fikk ingen instruks, bare et punktum", men Claude vil gjennomføre instruksen. Det er med andre ord forskjell på villigheten til å gjette på hva brukeren mener. Uten at jeg har erfaringer med Codex, vil jeg tro den gjetter mindre og spør oftere. Det kan gi gode resultat dersom du chatter mye og ikke ønsker at agenten skal dure av gårde i en retning du ikke ønsker.
 
 
 # Ting KI kan gjøre
@@ -235,9 +190,11 @@ Prøv disse tingene:
   > lag en pr med gh kommandolinje. tittel på pr skal inneholde saksnummeret fra jira, beskrivelsen skal inneholde hva som er gjort og hvorfor. det skal være en liste med commits i kronologisk rekkefølge, prefikset med kort sha1, slik at det kan trykkes på i github, en forklaring på hensikten/hvorfor endringen gjøres, samt en notis om hvordan det kan testes av den som skal gjøre review. la output være en gh-kommando jeg kan kjøre selv
 
 
+# Ingen generert dokumentasjon
+
+
+# Remote tilgang
+
+
 # Tips fra folk på internett
-https://www.aihero.dev/ er bra. Vil Prøve å selge deg et kurs, men har også mye informasjon gratis, slik som ["hvordan KI-koding har endret hjernen min"]([ways-ai-coding-has-rewired-my-brain](https://www.aihero.dev/ways-ai-coding-has-rewired-my-brain)).
-
-[Alex Ziskind](https://www.youtube.com/@AZisk) har mye bra om hvordan en kjører KI-modeller lokalt, slik som [local AI just leveled up](https://www.youtube.com/watch?v=2t9XrPcAiHg).
-
-[Burke Holland](https://www.youtube.com/@BurkeHolland) har mye bra om Githubs produkter, slik som [intro til Copilot hooks](https://www.youtube.com/watch?v=03CfGf9iw_U).
+https://www.aihero.dev/ways-ai-coding-has-rewired-my-brain

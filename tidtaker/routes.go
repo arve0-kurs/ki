@@ -26,8 +26,14 @@ func registerRoutes(se *core.ServeEvent) {
 
 	// Protected pages (auth checked in handler)
 	se.Router.GET("/timer", handleTimerPage)
+	se.Router.GET("/projects", handleProjectsPage)
+	se.Router.POST("/projects", handleProjectCreate)
+	se.Router.POST("/projects/{id}/delete", handleProjectDelete)
+	se.Router.POST("/projects/{id}", handleProjectUpdate)
 
 	// API endpoints
+	se.Router.GET("/api/export", handleExport)
+
 	api := se.Router.Group("/api/timings")
 	api.POST("/start", handleTimingStart)
 	api.POST("/{id}/stop", handleTimingStop)

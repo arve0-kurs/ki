@@ -46,6 +46,7 @@ var funcMap = template.FuncMap{
 		return false
 	},
 	"eq": func(a, b string) bool { return a == b },
+	"now": func() string { return time.Now().Format("2006-01") },
 	"unixMilli": func(dt types.DateTime) int64 {
 		if dt.IsZero() {
 			return 0
@@ -85,6 +86,7 @@ func initTemplates() {
 		"login":    "templates/auth/login.html",
 		"register": "templates/auth/register.html",
 		"timer":    "templates/timer/timer_page.html",
+		"projects": "templates/projects/projects_page.html",
 	}
 
 	for name, page := range pages {

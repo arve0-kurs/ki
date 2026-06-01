@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Tidtaker → Xledger",
+  "version": "1.0.0",
+  "description": "Importer tidtaker-eksport til Xledger timeregistrering ved å dra og slippe JSON-fil",
+  "content_scripts": [
+    {
+      "matches": ["https://www.xledger.net/f/timesheet*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

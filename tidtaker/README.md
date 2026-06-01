@@ -12,6 +12,9 @@ En tidsregistreringsapplikasjon bygget med PocketBase og HTMX.
 - **Uendelig scroll** – Bla gjennom alle registreringer med automatisk lasting
 - **Søk** – Fulltekstsøk på beskrivelse og tagger (AND-basert)
 - **Filter og sortering** – Filtrer på tagger, sorter på tid eller beskrivelse
+- **Prosjektmapping** – Knytt tags til Xledger-prosjekt og aktivitet på `/projects`
+- **Xledger-eksport** – Last ned måneds-JSON klar for Xledger via `GET /api/export?month=2026-06`
+- **Chrome-plugin** – Dra og slipp eksport-JSON direkte inn i Xledger timeregistrering
 
 ## Stack
 
