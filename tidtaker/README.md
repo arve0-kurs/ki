@@ -8,6 +8,7 @@ En tidsregistreringsapplikasjon bygget med PocketBase og HTMX.
 - **Timer** – Start/stopp tidtaking med ett klikk
 - **Beskrivelser og tags** – Legg til beskrivelse og tagger på registreringer
 - **Redigering** – Endre start-/stopptid og beskrivelse i etterkant
+- **Norsk datoformat** – Datoer vises som «1. juni 2026» (langt norsk format)
 - **Uendelig scroll** – Bla gjennom alle registreringer med automatisk lasting
 - **Søk** – Fulltekstsøk på beskrivelse og tagger (AND-basert)
 - **Filter og sortering** – Filtrer på tagger, sorter på tid eller beskrivelse

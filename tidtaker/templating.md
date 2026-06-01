@@ -104,6 +104,14 @@ Relevante metoder på `core.Record`:
 | `GetDateTime "felt"` | `types.DateTime` |
 | `GetStringSlice "felt"` | `[]string` |
 
+## Egendefinerte hjelpefunksjoner (templates.go)
+
+| Funksjon | Beskrivelse | Eksempel output |
+|----------|-------------|-----------------|
+| `formatDate dt` | Norsk langt datoformat | `1. juni 2026` |
+| `formatTime dt` | Klokkeslett | `12:30:00` |
+| `formatDuration start stop` | Varighet som tekst | `1t 5m 3s` |
+
 ## Whitespace-kontroll
 
 ```html

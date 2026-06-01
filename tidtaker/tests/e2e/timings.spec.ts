@@ -155,3 +155,21 @@ test.describe('Slett timing', () => {
     await expect(page.locator('#timings-list .bg-white')).toHaveCount(0);
   });
 });
+
+test.describe('Datoformat', () => {
+  test('dato vises som norsk langt format (f.eks. "1. juni 2026")', async ({ page }) => {
+    await loginAsNewUser(page);
+
+    await page.click('button:has-text("Start")');
+    await page.waitForTimeout(500);
+    await page.click('button:has-text("Stopp")');
+
+    await expect(page.locator('#timings-list .bg-white')).toHaveCount(1);
+
+    // Dato skal vises som "D. måned ÅÅÅÅ" (norsk langt format)
+    const norskMåneder = 'januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember';
+    await expect(page.locator('#timings-list .bg-white').first()).toContainText(
+      new RegExp(`\\d{1,2}\\. (${norskMåneder}) \\d{4}`)
+    );
+  });
+});
