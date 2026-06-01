@@ -46,6 +46,12 @@ var funcMap = template.FuncMap{
 		return false
 	},
 	"eq": func(a, b string) bool { return a == b },
+	"unixMilli": func(dt types.DateTime) int64 {
+		if dt.IsZero() {
+			return 0
+		}
+		return dt.Time().UnixMilli()
+	},
 	"localTime": func(dt types.DateTime) string {
 		if dt.IsZero() {
 			return ""

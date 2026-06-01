@@ -4,7 +4,8 @@
   <!-- Active timer -->
   <div class="text-center">
     <div class="text-lg font-medium text-green-600 mb-2">Timer aktiv</div>
-    <div class="text-3xl font-mono font-bold text-gray-800 mb-4" id="active-timer">
+    <div class="text-3xl font-mono font-bold text-gray-800 mb-4" id="active-timer"
+      data-start-ms="{{unixMilli (.ActiveTiming.GetDateTime "startTime")}}">
       {{formatDuration (.ActiveTiming.GetDateTime "startTime") (.ActiveTiming.GetDateTime "stopTime")}}
     </div>
     <button
@@ -64,4 +65,37 @@
   </div>
   {{end}}
 </div>
+
+<script>
+(function() {
+  var el = document.getElementById('active-timer');
+  if (!el) return;
+  var startMs = parseInt(el.getAttribute('data-start-ms'), 10);
+  if (!startMs) return;
+
+  function fmtDuration(totalSec) {
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    if (h > 0) return h + 't ' + pad(m) + 'm ' + pad(s) + 's';
+    if (m > 0) return m + 'm ' + pad(s) + 's';
+    return s + 's';
+  }
+
+  function tick() {
+    var elapsed = Math.floor((Date.now() - startMs) / 1000);
+    el.textContent = fmtDuration(elapsed);
+  }
+
+  tick();
+  var interval = setInterval(function() {
+    if (!document.getElementById('active-timer')) {
+      clearInterval(interval);
+      return;
+    }
+    tick();
+  }, 1000);
+})();
+</script>
 {{end}}

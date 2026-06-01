@@ -19,6 +19,20 @@ test.describe('Timer start/stop', () => {
     await loginAsNewUser(page);
   });
 
+  test('timer teller opp sekunder etter start', async ({ page }) => {
+    await page.click('button:has-text("Start")');
+    await expect(page.locator('#timer-section')).toContainText('Timer aktiv');
+
+    // Read the initial displayed time
+    const timerEl = page.locator('#active-timer');
+    const initialText = await timerEl.textContent();
+
+    // Wait 2 seconds and verify the displayed time has changed (counting up)
+    await page.waitForTimeout(2000);
+    const laterText = await timerEl.textContent();
+    expect(laterText).not.toBe(initialText);
+  });
+
   test('kan starte en timer', async ({ page }) => {
     await expect(page.locator('#timer-section')).toContainText('Ingen aktiv timer');
 
